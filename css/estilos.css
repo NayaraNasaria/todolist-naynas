@@ -94,7 +94,7 @@ body{
     position: fixed;
     top: 30%;
     left: 35%;
-    transform: translateY(-50%, -50%);
+    right: 30%;
     padding: 20px;
     background-color: #043339;
     border: 1px solid #fff;
