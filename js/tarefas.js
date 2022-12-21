@@ -8,11 +8,6 @@ let btnAtualizarTarefa = document.querySelector('#btnAtualizarTarefa');
 let idTarefaEdicao = document.querySelector('#idTarefaEdicao');
 let inputTarefaNomeEdicao = document.querySelector('#inputTarefaNomeEdicao');
 const qtdIdsDisponiveis = Number.MAX_VALUE;
-let dbTarefas = [];
-const KEY_LOCAL_STORAGE = 'listaTarefas';
-
-obterTarefasLocalStorage();
-renderizarListaTarefaHtml();
 
 inputNovaTarefa.addEventListener('keypress', (e) => {
 
