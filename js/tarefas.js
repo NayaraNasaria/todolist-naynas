@@ -8,6 +8,11 @@ let btnAtualizarTarefa = document.querySelector('#btnAtualizarTarefa');
 let idTarefaEdicao = document.querySelector('#idTarefaEdicao');
 let inputTarefaNomeEdicao = document.querySelector('#inputTarefaNomeEdicao');
 const qtdIdsDisponiveis = Number.MAX_VALUE;
+let dbTarefas = [];
+const KEY_LOCAL_STORAGE = 'listaTarefas';
+
+obterTarefasLocalStorage();
+renderizarListaTarefaHtml();
 
 inputNovaTarefa.addEventListener('keypress', (e) => {
 
@@ -46,6 +51,11 @@ btnAtualizarTarefa.addEventListener('click', (e) => {
     let tarefaAtual = document.getElementById(''+idTarefa+'');
 
     if(tarefaAtual) {
+
+        const indicetarefa = obterIndiceTarefaporId(idTarefa);
+        dbTarefas[indicetarefa] = tarefa;
+        salvarTarefasLocalStorage();
+
         let li = criarTagLI(tarefa);
         listaTarefas.replaceChild(li, tarefaAtual);
         alternarJanelaEdicao();
@@ -94,9 +104,9 @@ function adicionarTarefa(tarefa) {
     if (inputNovaTarefa.value == '') {
         alert('Adicione uma tarefa');
     } else {
-        let li = criarTagLI(tarefa);
-    listaTarefas.appendChild(li);  
-    inputNovaTarefa.value = '';
+        dbTarefas.push(tarefa);
+        salvarTarefasLocalStorage();
+        renderizarListaTarefaHtml();
     }
 }
 
@@ -132,6 +142,7 @@ function criarTagLI(tarefa) {
 function editar(idTarefa) {
     let li = document.getElementById(''+ idTarefa + '');
     if(li) {
+
         idTarefaEdicao.innerHTML = '#' + idTarefa;
         inputTarefaNomeEdicao.value = li.innerText;
         alternarJanelaEdicao();
@@ -141,8 +152,17 @@ function editar(idTarefa) {
 }
 
 function excluir(idTarefa) {
+
     let confirmacao = window.confirm('Tem certeza que deseja excluir? ');
     if(confirmacao) {
+
+        const indicetarefa = obterIndiceTarefaporId(idTarefa);
+
+        if(indicetarefa > -1){
+            dbTarefas.splice(indicetarefa,1);
+            salvarTarefasLocalStorage();
+        }
+
         let li = document.getElementById(''+ idTarefa + '');
         if(li) {
             listaTarefas.removeChild(li);
@@ -155,4 +175,33 @@ function excluir(idTarefa) {
 function alternarJanelaEdicao() {
     janelaEdicao.classList.toggle('abrir');
     janelaEdicaoFundo.classList.toggle('abrir');
+}
+
+function obterIndiceTarefaporId(idTarefa){
+    const indicetarefa = dbTarefas.findIndex(t => t.id == idTarefa);
+
+        if(indicetarefa < 0){
+            throw new Error('Id da tarefa não encontrado: ', idTarefa);
+        }
+        return indicetarefa
+}
+
+function renderizarListaTarefaHtml(){
+    listaTarefas.innerHTML = '';
+    for(let i=0; i < dbTarefas.length; i++){
+    let li = criarTagLI(dbTarefas[i]);
+    listaTarefas.appendChild(li);  
+    }
+
+    inputNovaTarefa.value = '';
+}
+
+function salvarTarefasLocalStorage(){
+    localStorage.setItem(KEY_LOCAL_STORAGE, JSON.stringify(dbTarefas));
+}
+
+function obterTarefasLocalStorage(){
+    if(localStorage.getItem(KEY_LOCAL_STORAGE)){
+       dbTarefas = JSON.parse(localStorage.getItem(KEY_LOCAL_STORAGE));
+    }
 }
